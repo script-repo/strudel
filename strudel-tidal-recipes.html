@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strudel & Tidal - 20 Best Live Coding Recipes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            margin-bottom: 10px;
+        }
+
+        .intro {
+            font-size: 1.1em;
+            max-width: 800px;
+            margin: 20px auto;
+            line-height: 1.6;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .recipes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .recipe-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recipe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+
+        .recipe-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .recipe-number {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .recipe-title {
+            font-size: 1.6em;
+            margin-bottom: 15px;
+            color: #2d3748;
+            font-weight: 600;
+            padding-right: 60px;
+        }
+
+        .recipe-category {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .recipe-description {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            font-size: 1em;
+        }
+
+        .recipe-code {
+            background: #1a202c;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .recipe-meta {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .meta-item {
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+
+        .meta-label {
+            font-weight: 600;
+            color: #667eea;
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .meta-value {
+            color: #4a5568;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            padding: 30px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        footer a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .recipes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎵 Strudel & Tidal Live Coding Recipes</h1>
+            <p class="subtitle">20 Hand-Picked Patterns for Creative Music Making</p>
+            <div class="intro">
+                <p><strong>Strudel</strong> is a browser-based live coding environment that brings the power of <strong>TidalCycles</strong> to JavaScript. Create algorithmic music patterns, live code beats, melodies, and soundscapes - all from your browser. Click any recipe below to try it on <a href="https://strudel.cc" style="color: white;">strudel.cc</a>!</p>
+            </div>
+        </header>
+
+        <div class="recipes-grid">
+            <!-- Recipe 1 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">1</div>
+                <span class="recipe-category">Drum Patterns</span>
+                <h2 class="recipe-title">Four-on-the-Floor House Beat</h2>
+                <p class="recipe-description">The quintessential house music drum pattern with a steady kick on every beat and syncopated hi-hats. Perfect foundation for dance music.</p>
+                <div class="recipe-code">s("bd sd bd sd, hh*8")
+  .bank("RolandTR909")</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Creates a classic 4/4 house beat using the iconic Roland TR-909 drum machine sounds</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Samples Documentation</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Essential starting point for electronic music; demonstrates basic sequencing and layering</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 2 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">2</div>
+                <span class="recipe-category">Euclidean Rhythms</span>
+                <h2 class="recipe-title">Euclidean Techno Rhythm</h2>
+                <p class="recipe-description">Uses Euclidean algorithms to distribute hits evenly across steps, creating mathematically interesting and groovy patterns found in many world music traditions.</p>
+                <div class="recipe-code">stack(
+  s("bd").euclidean(3, 8),
+  s("sd").euclidean(5, 16),
+  s("hh").euclidean(7, 16)
+)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Layers three Euclidean patterns: 3 kicks over 8 steps, 5 snares over 16, and 7 hi-hats over 16</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Euclidean Rhythm Documentation</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Demonstrates algorithmic rhythm generation; produces complex, organic-feeling grooves with minimal code</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 3 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">3</div>
+                <span class="recipe-category">Polyrhythms</span>
+                <h2 class="recipe-title">Polyrhythmic Percussion</h2>
+                <p class="recipe-description">Multiple rhythms with different time signatures playing simultaneously, creating rich, interlocking patterns.</p>
+                <div class="recipe-code">s("bd*2, rim*3, hh*5, perc*7")
+  .gain(0.8)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Creates polyrhythmic texture with 2, 3, 5, and 7 evenly-spaced hits per cycle</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Mini Notation Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Shows polyrhythmic concepts; creates evolving patterns that phase in and out</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 4 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">4</div>
+                <span class="recipe-category">Breakbeats</span>
+                <h2 class="recipe-title">Amen Break Chopper</h2>
+                <p class="recipe-description">Chops the legendary Amen break into slices that can be rearranged and transformed - the foundation of drum and bass, jungle, and breakcore.</p>
+                <div class="recipe-code">s("amen")
+  .chop(8)
+  .loopAt(2)
+  .room(0.3)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Slices the Amen break into 8 pieces, loops it over 2 cycles with reverb</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Samples Documentation</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Demonstrates sample manipulation; iconic breakbeat used in countless tracks</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 5 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">5</div>
+                <span class="recipe-category">Ambient</span>
+                <h2 class="recipe-title">Ambient Pad with Reverb</h2>
+                <p class="recipe-description">Lush, evolving ambient texture using slow-moving chords with heavy reverb and filtering.</p>
+                <div class="recipe-code">note("&lt;[c2,e2,g2] [d2,f2,a2] [e2,g2,b2]&gt;")
+  .s("sawtooth")
+  .cutoff(800)
+  .room(0.9)
+  .rsize(5)
+  .slow(4)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Plays slow chord progression with sawtooth synth, filtered and drenched in reverb</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Audio Effects Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Shows chord voicing, reverb/filter effects, and time manipulation for atmospheric music</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 6 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">6</div>
+                <span class="recipe-category">Melodic</span>
+                <h2 class="recipe-title">Arpeggio Melody</h2>
+                <p class="recipe-description">A flowing arpeggiated pattern that cycles through chord tones, perfect for melodic hooks.</p>
+                <div class="recipe-code">note("c3 eb3 g3 c4")
+  .s("gm_electric_guitar_clean")
+  .clip(2)
+  .room(0.2)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Creates an arpeggio from C minor chord using clean electric guitar sound</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Synths Documentation</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Essential melodic technique; demonstrates note sequencing and soundbank selection</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 7 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">7</div>
+                <span class="recipe-category">Transformations</span>
+                <h2 class="recipe-title">Palindrome Pattern</h2>
+                <p class="recipe-description">Alternates between forward and backward playback every other cycle, creating mesmerizing symmetrical patterns.</p>
+                <div class="recipe-code">n("0 1 [4 3] 2")
+  .sound("jazz")
+  .every(2, rev)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Plays a pattern forward one cycle, then reversed the next cycle</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Time Modifiers Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Shows pattern transformation functions; creates interesting call-and-response effects</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 8 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">8</div>
+                <span class="recipe-category">Bass</span>
+                <h2 class="recipe-title">Fast Bassline</h2>
+                <p class="recipe-description">Rapid-fire bass pattern cycling through different notes, great for energetic tracks.</p>
+                <div class="recipe-code">note("&lt;f2 eb2 c2 f1&gt;*4")
+  .s("sawtooth")
+  .cutoff(400)
+  .resonance(10)
+  .gain(0.7)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Creates a fast, filtered bassline that cycles through 4 different notes</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Synths Documentation</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Demonstrates bass synthesis with filter resonance; key element in electronic music</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 9 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">9</div>
+                <span class="recipe-category">Scales</span>
+                <h2 class="recipe-title">Minor Scale Melody</h2>
+                <p class="recipe-description">Uses scale notation to ensure all notes are in key, making it easy to create harmonically coherent melodies.</p>
+                <div class="recipe-code">n("0 2 4 &lt;[6,8] [7,9]&gt;")
+  .scale("C:minor")
+  .s("piano")
+  .room(0.3)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Plays scale degrees in C minor with piano sound, including some harmonies</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Tonal Functions Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Essential for tonal music; makes creating in-key melodies effortless</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 10 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">10</div>
+                <span class="recipe-category">Chords</span>
+                <h2 class="recipe-title">Jazz Chord Progression</h2>
+                <p class="recipe-description">Sophisticated chord progression using chord symbols, with automatic voice leading for smooth transitions.</p>
+                <div class="recipe-code">note("&lt;Cm7 Fm7 Bb7 Ebmaj7&gt;")
+  .s("piano")
+  .voicing()
+  .slow(2)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Plays a ii-V-I progression in jazz style with automatic voicing</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Chord Voicings Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Shows chord symbol notation and voice leading; essential for harmonic composition</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 11 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">11</div>
+                <span class="recipe-category">Techno</span>
+                <h2 class="recipe-title">Filtered Techno Loop</h2>
+                <p class="recipe-description">Driving techno pattern with evolving filter sweeps creating hypnotic movement.</p>
+                <div class="recipe-code">s("bd sd, hh*3")
+  .bank("RolandTR909")
+  .cutoff("&lt;4000 2000 1000 500&gt;")
+  .resonance(8)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Classic techno beat with sweeping low-pass filter automation</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Audio Effects Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Core techno production technique; shows dynamic filter modulation</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 12 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">12</div>
+                <span class="recipe-category">Effects</span>
+                <h2 class="recipe-title">Delayed Echo Pattern</h2>
+                <p class="recipe-description">Melodic phrase with carefully tuned delay creating rhythmic echoes and spatial depth.</p>
+                <div class="recipe-code">note("c4 a3 f3 e3")
+  .s("sine")
+  .delay(0.65)
+  .delaytime(0.27)
+  .delayfeedback(0.8)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Simple melody with rhythmic delay effect creating complex echoing patterns</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Audio Effects Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Essential effect for depth and rhythm; demonstrates detailed delay parameters</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 13 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">13</div>
+                <span class="recipe-category">Synth Lead</span>
+                <h2 class="recipe-title">Distorted Synth Lead</h2>
+                <p class="recipe-description">Aggressive lead synth with distortion and envelope shaping for punchy, cutting sounds.</p>
+                <div class="recipe-code">note("d3!8")
+  .s("sine")
+  .penv(36)
+  .pdecay(0.12)
+  .decay(0.23)
+  .distort("8:0.4")</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Creates distorted lead tone with pitch envelope for aggressive sound design</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Audio Effects Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Shows envelope shaping and distortion; great for aggressive electronic styles</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 14 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">14</div>
+                <span class="recipe-category">Advanced Rhythms</span>
+                <h2 class="recipe-title">Complex Polyrhythm Stack</h2>
+                <p class="recipe-description">Multi-layered polyrhythmic pattern demonstrating advanced stacking techniques for intricate grooves.</p>
+                <div class="recipe-code">stack(
+  s("bd").struct("x ~ ~ x ~ x ~ ~"),
+  s("sd").struct("~ ~ x ~ ~ x ~ x"),
+  s("hh*8").gain(0.6),
+  s("perc*5").gain(0.4)
+)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Layers custom rhythmic structures with different gain levels</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Pattern Construction</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Advanced layering technique; shows how to build complex rhythmic textures</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 15 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">15</div>
+                <span class="recipe-category">Generative</span>
+                <h2 class="recipe-title">Generative Scale Wanderer</h2>
+                <p class="recipe-description">Uses algorithmic pattern generation to create ever-evolving melodies that never repeat exactly.</p>
+                <div class="recipe-code">n("&lt;0 2 [4 5] [3 7]&gt;*4")
+  .scale("&lt;C:major D:dorian&gt;")
+  .s("triangle")
+  .cutoff(perlin.range(500,2000))
+  .room(0.4)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Generates melodic patterns that change scale while modulating filter with Perlin noise</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Pattern Effects</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Shows generative techniques and continuous modulation; creates organic variation</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 16 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">16</div>
+                <span class="recipe-category">Drum Patterns</span>
+                <h2 class="recipe-title">TR-909 Full Kit Pattern</h2>
+                <p class="recipe-description">Complete drum pattern using the legendary Roland TR-909, the backbone of techno, house, and acid music.</p>
+                <div class="recipe-code">s("bd:0 hh:1 hh:2 hh:3 hh:4 hh:5 hh:6 hh:7")
+  .bank("RolandTR909")
+  .gain("1 0.6 0.8 0.6 1 0.6 0.8 0.7")</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Sequences through different TR-909 hi-hat variations with dynamic volume</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Samples Guide</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Iconic drum machine; shows sample selection and gain patterns</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 17 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">17</div>
+                <span class="recipe-category">Transformations</span>
+                <h2 class="recipe-title">Reversed Texture</h2>
+                <p class="recipe-description">Plays samples in reverse for ethereal, otherworldly textures often used in ambient and experimental music.</p>
+                <div class="recipe-code">s("pad:1 pad:2 pad:3")
+  .rev()
+  .slow(2)
+  .room(0.8)
+  .gain(0.7)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Reverses pad samples, slows them down, and adds reverb for dreamy atmosphere</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Time Modifiers</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Creative sound design technique; demonstrates reverse playback</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 18 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">18</div>
+                <span class="recipe-category">Ambient</span>
+                <h2 class="recipe-title">Slow Ambient Texture</h2>
+                <p class="recipe-description">Extremely slowed-down pattern creating meditative, evolving soundscapes.</p>
+                <div class="recipe-code">note("&lt;a2 c3 e3 g3&gt;")
+  .s("sawtooth")
+  .slow(8)
+  .lpf(400)
+  .room(0.95)
+  .gain(0.5)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Creates very slow chord changes with heavy filtering and reverb</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Time Modifiers</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Shows extreme time manipulation for ambient music; demonstrates atmospheric production</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 19 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">19</div>
+                <span class="recipe-category">Rhythmic Effects</span>
+                <h2 class="recipe-title">Phasing Pattern</h2>
+                <p class="recipe-description">Two identical patterns at slightly different speeds create phase-shifting effects, inspired by Steve Reich's minimalist compositions.</p>
+                <div class="recipe-code">stack(
+  s("bd sd hh cp").fast(1),
+  s("bd sd hh cp").fast(1.01)
+).gain(0.6)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Same pattern at two speeds gradually drifts out of and back into phase</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Recipes</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Classic minimalist technique; creates evolving rhythmic interest from simple material</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recipe 20 -->
+            <div class="recipe-card" onclick="openOnStrudel(this.querySelector('.recipe-code').textContent)">
+                <div class="recipe-number">20</div>
+                <span class="recipe-category">Synthesis</span>
+                <h2 class="recipe-title">Layered Synth Chords</h2>
+                <p class="recipe-description">Rich, detuned synth chords created by layering multiple waveforms for thick, analog-style sounds.</p>
+                <div class="recipe-code">stack(
+  note("&lt;Dm7 G7 Cmaj7&gt;").s("sawtooth"),
+  note("&lt;Dm7 G7 Cmaj7&gt;").s("square").detune(7)
+).cutoff(1200)
+.room(0.4)
+.slow(2)</div>
+                <div class="recipe-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">What it does:</span>
+                        <span class="meta-value">Layers sawtooth and detuned square wave for fat analog-style chords</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Source:</span>
+                        <span class="meta-value">Strudel Recipes</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Why selected:</span>
+                        <span class="meta-value">Classic synthesis technique; demonstrates detuning for thick sounds</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <h3>Ready to Start Live Coding?</h3>
+            <p style="margin: 15px 0;">Visit <a href="https://strudel.cc" target="_blank">strudel.cc</a> to try these patterns and create your own!</p>
+            <p style="margin-top: 20px; font-size: 0.9em; opacity: 0.9;">
+                Learn more:
+                <a href="https://strudel.cc/learn/" target="_blank">Strudel Docs</a> |
+                <a href="https://tidalcycles.org/" target="_blank">TidalCycles</a> |
+                <a href="https://toplap.org/" target="_blank">TOPLAP</a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        function openOnStrudel(code) {
+            // Encode the code for URL
+            const encodedCode = encodeURIComponent(code.trim());
+            // Open in new tab with code parameter
+            // Note: strudel.cc supports loading code via URL hash
+            window.open(`https://strudel.cc/#${encodedCode}`, '_blank');
+        }
+    </script>
+</body>
+</html>
