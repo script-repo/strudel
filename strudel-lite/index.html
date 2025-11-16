@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strudel Lite - Live Code Music in Your Browser</title>
+    <meta name="description" content="A minimal, beautiful live coding environment for making music with Strudel">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --purple: #8b5cf6;
+            --blue: #3b82f6;
+            --pink: #ec4899;
+            --cyan: #06b6d4;
+            --green: #10b981;
+            --red: #ef4444;
+            --orange: #f59e0b;
+            --glass-bg: rgba(17, 17, 27, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #f5f5f7;
+            --text-secondary: #a0a0a8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Animated gradient background */
+        .gradient-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg,
+                var(--purple) 0%,
+                var(--blue) 25%,
+                var(--pink) 50%,
+                var(--purple) 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.15;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Glass morphism container */
+        .glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 30px;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        /* Buttons */
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            color: white;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(139, 92, 246, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--red);
+            border: 1px solid var(--red);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(239, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-icon {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            padding: 12px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Main content area */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 20px;
+            min-height: 0;
+        }
+
+        /* Editor section */
+        .editor-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .editor-wrapper {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .editor-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        #code-editor {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #code-editor:focus {
+            border-color: var(--purple);
+        }
+
+        /* Error display */
+        .error-display {
+            padding: 16px 24px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--red);
+            border-radius: 12px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .error-display.show {
+            display: block;
+        }
+
+        .error-title {
+            font-weight: 600;
+            color: var(--red);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        /* Right sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Panel */
+        .panel {
+            padding: 24px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--cyan), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Recipe cards */
+        .recipes-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .recipe-card {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recipe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--purple), var(--pink));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .recipe-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--purple);
+            transform: translateX(4px);
+        }
+
+        .recipe-card:hover::before {
+            opacity: 1;
+        }
+
+        .recipe-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        .recipe-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+
+        .recipe-category {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--purple);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Keyboard shortcuts modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--purple), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .shortcut-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .shortcut-keys {
+            display: flex;
+            gap: 4px;
+        }
+
+        .key {
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: monospace;
+        }
+
+        /* Status indicator */
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s ease infinite;
+        }
+
+        .status-dot.playing {
+            background: var(--green);
+        }
+
+        .status-dot.stopped {
+            background: var(--text-secondary);
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading indicator */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid var(--purple);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Welcome message */
+        .welcome {
+            padding: 20px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1));
+            border: 1px solid var(--purple);
+            border-radius: 12px;
+        }
+
+        .welcome h3 {
+            margin-bottom: 8px;
+            color: var(--purple);
+        }
+
+        .welcome p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            header {
+                padding: 16px;
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .btn-icon {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient-bg"></div>
+
+    <div class="container">
+        <header class="glass">
+            <div class="logo">⚡ Strudel Lite</div>
+
+            <div class="controls">
+                <div class="status">
+                    <div class="status-dot stopped" id="status-dot"></div>
+                    <span id="status-text">Ready</span>
+                </div>
+
+                <button class="btn-primary" id="play-btn" title="Ctrl+Enter to play" aria-label="Play or update pattern">
+                    ▶ Play
+                </button>
+
+                <button class="btn-secondary" id="stop-btn" title="Ctrl+. to stop" aria-label="Stop playback" disabled>
+                    ■ Stop
+                </button>
+
+                <button class="btn-icon" id="shortcuts-btn" title="Keyboard shortcuts" aria-label="Show keyboard shortcuts">
+                    ?
+                </button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="editor-section">
+                <div class="editor-wrapper glass">
+                    <div class="editor-label">Code Editor</div>
+                    <textarea id="code-editor" spellcheck="false" placeholder="// Write your Strudel pattern here
+// Try: &quot;bd sd hh sd&quot;.s()
+// Press Ctrl+Enter to play" aria-label="Code editor for Strudel patterns">"bd sd hh sd".s()</textarea>
+                </div>
+
+                <div class="error-display glass" id="error-display">
+                    <div class="error-title">
+                        ⚠ Error
+                    </div>
+                    <div class="error-message" id="error-message"></div>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="panel glass">
+                    <div class="welcome">
+                        <h3>Welcome to Strudel Lite! 🎵</h3>
+                        <p>Click any recipe below to load and play it. Edit the code and press <strong>Ctrl+Enter</strong> to update. Press <strong>?</strong> for keyboard shortcuts.</p>
+                    </div>
+
+                    <div class="panel-title">Recipe Library</div>
+                    <div class="recipes-grid" id="recipes-grid">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            <p>Loading recipes...</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="modal" id="shortcuts-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">⌨ Keyboard Shortcuts</div>
+                <button class="close-btn" id="close-modal" aria-label="Close shortcuts dialog">&times;</button>
+            </div>
+
+            <div class="shortcuts-grid">
+                <div class="shortcut-item">
+                    <span class="shortcut-desc">Play / Update pattern</span>
+                    <div class="shortcut-keys">
+                        <span class="key">Ctrl</span>
+                        <span class="key">Enter</span>
+                    </div>
+                </div>
+
+                <div class="shortcut-item">
+                    <span class="shortcut-desc">Stop playback</span>
+                    <div class="shortcut-keys">
+                        <span class="key">Ctrl</span>
+                        <span class="key">.</span>
+                    </div>
+                </div>
+
+                <div class="shortcut-item">
+                    <span class="shortcut-desc">Show/hide keyboard shortcuts</span>
+                    <div class="shortcut-keys">
+                        <span class="key">?</span>
+                    </div>
+                </div>
+
+                <div class="shortcut-item">
+                    <span class="shortcut-desc">Comment/uncomment line</span>
+                    <div class="shortcut-keys">
+                        <span class="key">Ctrl</span>
+                        <span class="key">/</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Strudel from CDN -->
+    <script src="https://unpkg.com/@strudel.cycles/core@1.3.0/dist/strudel.core.cjs.js"></script>
+    <script src="https://unpkg.com/@strudel.cycles/mini@1.3.0/dist/strudel.mini.cjs.js"></script>
+    <script src="https://unpkg.com/@strudel.cycles/transpiler@1.3.0/dist/strudel.transpiler.cjs.js"></script>
+    <script src="https://unpkg.com/@strudel.cycles/webaudio@1.3.0/dist/strudel.webaudio.cjs.js"></script>
+    <script src="https://unpkg.com/@strudel.cycles/tonal@1.3.0/dist/strudel.tonal.cjs.js"></script>
+
+    <script type="module">
+        // State
+        let isPlaying = false;
+        let currentPattern = null;
+        let scheduler = null;
+
+        // DOM elements
+        const codeEditor = document.getElementById('code-editor');
+        const playBtn = document.getElementById('play-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const shortcutsBtn = document.getElementById('shortcuts-btn');
+        const shortcutsModal = document.getElementById('shortcuts-modal');
+        const closeModal = document.getElementById('close-modal');
+        const recipesGrid = document.getElementById('recipes-grid');
+        const errorDisplay = document.getElementById('error-display');
+        const errorMessage = document.getElementById('error-message');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
+
+        // Initialize Strudel
+        async function initStrudel() {
+            try {
+                // Wait for Strudel libraries to be available
+                let attempts = 0;
+                const maxAttempts = 50;
+
+                while (attempts < maxAttempts) {
+                    if (window.strudel && window.strudel.core) {
+                        break;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.strudel || !window.strudel.core) {
+                    throw new Error('Strudel libraries failed to load. Please refresh the page or check your internet connection.');
+                }
+
+                console.log('Strudel libraries loaded successfully');
+                loadRecipes();
+            } catch (error) {
+                console.error('Failed to initialize Strudel:', error);
+                showError(error.message || 'Failed to initialize. Please refresh the page.');
+            }
+        }
+
+        // Load recipes from JSON
+        async function loadRecipes() {
+            try {
+                const response = await fetch('recipes.json');
+                const recipes = await response.json();
+
+                recipesGrid.innerHTML = '';
+
+                recipes.forEach(recipe => {
+                    const card = document.createElement('div');
+                    card.className = 'recipe-card';
+                    card.innerHTML = `
+                        <div class="recipe-title">${recipe.title}</div>
+                        <div class="recipe-description">${recipe.description}</div>
+                        <span class="recipe-category">${recipe.category}</span>
+                    `;
+
+                    card.addEventListener('click', () => loadRecipe(recipe));
+                    recipesGrid.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Failed to load recipes:', error);
+                recipesGrid.innerHTML = '<p style="color: var(--text-secondary);">Failed to load recipes. Please check recipes.json exists.</p>';
+            }
+        }
+
+        // Load a recipe into the editor
+        function loadRecipe(recipe) {
+            codeEditor.value = recipe.code;
+            hideError();
+
+            // Auto-play the recipe
+            if (!isPlaying) {
+                play();
+            } else {
+                // Update the pattern
+                play();
+            }
+        }
+
+        // Play the current pattern
+        async function play() {
+            try {
+                const code = codeEditor.value.trim();
+
+                if (!code) {
+                    showError('Please enter some code first');
+                    return;
+                }
+
+                if (!window.strudel || !window.strudel.core) {
+                    showError('Strudel not initialized. Please refresh the page.');
+                    return;
+                }
+
+                hideError();
+
+                // Note: This is a placeholder implementation
+                // The actual Strudel REPL integration would require importing
+                // the full @strudel/repl package or implementing custom evaluation
+                console.warn('Pattern evaluation not yet fully implemented');
+                console.log('Code to evaluate:', code);
+
+                // Update UI to show attempted play
+                isPlaying = true;
+                playBtn.textContent = '↻ Update';
+                stopBtn.disabled = false;
+                statusDot.className = 'status-dot playing';
+                statusText.textContent = 'Ready (REPL integration needed)';
+
+                showError('Note: Full pattern evaluation requires @strudel/repl integration. This is a UI demonstration.');
+            } catch (error) {
+                console.error('Error playing pattern:', error);
+                showError(error.message || 'Failed to evaluate pattern');
+            }
+        }
+
+        // Stop playback
+        function stop() {
+            try {
+                // Note: This is a placeholder implementation
+                // The actual stop functionality would require the scheduler from @strudel/repl
+                console.log('Stop requested');
+
+                // Update UI
+                isPlaying = false;
+                playBtn.textContent = '▶ Play';
+                stopBtn.disabled = true;
+                statusDot.className = 'status-dot stopped';
+                statusText.textContent = 'Stopped';
+
+                hideError();
+                console.log('Playback stopped');
+            } catch (error) {
+                console.error('Error stopping playback:', error);
+            }
+        }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorDisplay.classList.add('show');
+        }
+
+        // Hide error message
+        function hideError() {
+            errorDisplay.classList.remove('show');
+        }
+
+        // Event listeners
+        playBtn.addEventListener('click', play);
+        stopBtn.addEventListener('click', stop);
+
+        shortcutsBtn.addEventListener('click', () => {
+            shortcutsModal.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            shortcutsModal.classList.remove('show');
+        });
+
+        shortcutsModal.addEventListener('click', (e) => {
+            if (e.target === shortcutsModal) {
+                shortcutsModal.classList.remove('show');
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+Enter or Cmd+Enter - Play/Update
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                play();
+            }
+
+            // Ctrl+. or Cmd+. - Stop
+            if ((e.ctrlKey || e.metaKey) && e.key === '.') {
+                e.preventDefault();
+                stop();
+            }
+
+            // ? - Show shortcuts
+            if (e.key === '?' && !e.ctrlKey && !e.metaKey && document.activeElement !== codeEditor) {
+                e.preventDefault();
+                shortcutsModal.classList.toggle('show');
+            }
+
+            // Escape - Close modal
+            if (e.key === 'Escape') {
+                shortcutsModal.classList.remove('show');
+            }
+
+            // Ctrl+/ - Comment line (basic implementation)
+            if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+                e.preventDefault();
+                const start = codeEditor.selectionStart;
+                const end = codeEditor.selectionEnd;
+                const text = codeEditor.value;
+                const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+                const lineEnd = text.indexOf('\n', end);
+                const lineText = text.substring(lineStart, lineEnd === -1 ? text.length : lineEnd);
+
+                if (lineText.trimStart().startsWith('//')) {
+                    // Uncomment
+                    const newLine = lineText.replace(/^(\s*)\/\/\s?/, '$1');
+                    codeEditor.value = text.substring(0, lineStart) + newLine + text.substring(lineEnd === -1 ? text.length : lineEnd);
+                } else {
+                    // Comment
+                    const indent = lineText.match(/^\s*/)[0];
+                    const newLine = indent + '// ' + lineText.trimStart();
+                    codeEditor.value = text.substring(0, lineStart) + newLine + text.substring(lineEnd === -1 ? text.length : lineEnd);
+                }
+
+                // Restore cursor position
+                codeEditor.selectionStart = codeEditor.selectionEnd = start;
+            }
+        });
+
+        // Tab key support in textarea
+        codeEditor.addEventListener('keydown', (e) => {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = codeEditor.selectionStart;
+                const end = codeEditor.selectionEnd;
+                const value = codeEditor.value;
+
+                codeEditor.value = value.substring(0, start) + '  ' + value.substring(end);
+                codeEditor.selectionStart = codeEditor.selectionEnd = start + 2;
+            }
+        });
+
+        // Initialize on load
+        window.addEventListener('load', initStrudel);
+    </script>
+</body>
+</html>

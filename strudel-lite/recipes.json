@@ -1,0 +1,107 @@
+[
+  {
+    "id": "hello",
+    "title": "Hello Strudel",
+    "description": "A simple drum pattern to get started",
+    "category": "Beginner",
+    "code": "\"bd sd hh sd\".s()"
+  },
+  {
+    "id": "basic-drums",
+    "title": "Basic Drums",
+    "description": "Classic drum beat with kick, snare, and hi-hat",
+    "category": "Drums",
+    "code": "stack(\n  \"bd*2\".gain(0.9),\n  \"~ sd\".gain(0.7),\n  \"hh*8\".gain(0.5)\n).s()"
+  },
+  {
+    "id": "euclidean",
+    "title": "Euclidean Rhythm",
+    "description": "Using Euclidean rhythm generation (3 hits in 8 steps)",
+    "category": "Rhythms",
+    "code": "\"bd(3,8) sd(5,8,2) hh(7,8)\".s()"
+  },
+  {
+    "id": "melody",
+    "title": "Simple Melody",
+    "description": "A melodic pattern using a sawtooth synth",
+    "category": "Melody",
+    "code": "note(\"c3 e3 g3 b3\")\n  .s(\"sawtooth\")\n  .lpf(800)\n  .room(0.3)"
+  },
+  {
+    "id": "scales",
+    "title": "Scale Exploration",
+    "description": "Random notes from the C minor scale",
+    "category": "Melody",
+    "code": "note(\"c d eb f g ab bb\".segment(7))\n  .scale(\"C:minor\")\n  .struct(\"x(5,8)\")\n  .s(\"sawtooth\")\n  .cutoff(sine.range(500, 2000))\n  .room(0.5)"
+  },
+  {
+    "id": "ambient",
+    "title": "Ambient Pad",
+    "description": "Slow evolving ambient texture",
+    "category": "Ambient",
+    "code": "note(\"[c2,e2,g2] [f2,a2,c3] [g2,b2,d3] [a2,c3,e3]\")\n  .s(\"triangle\")\n  .slow(4)\n  .gain(0.5)\n  .lpf(sine.slow(8).range(400, 1200))\n  .room(0.9)\n  .delay(0.5)"
+  },
+  {
+    "id": "bass",
+    "title": "Bassline",
+    "description": "Funky bassline with filter modulation",
+    "category": "Bass",
+    "code": "note(\"c2 [~ c2] eb2 [g2 ab2]\")\n  .s(\"sawtooth\")\n  .cutoff(400)\n  .resonance(15)\n  .gain(0.8)"
+  },
+  {
+    "id": "polyrhythm",
+    "title": "Polyrhythm",
+    "description": "Multiple rhythms playing simultaneously",
+    "category": "Rhythms",
+    "code": "stack(\n  \"bd*2\",\n  \"hh*3\",\n  \"~ sd*2 ~\",\n  \"cp*5\".gain(0.3)\n).s().slow(2)"
+  },
+  {
+    "id": "mini-notation",
+    "title": "Mini Notation Features",
+    "description": "Demonstrates various mini notation operators",
+    "category": "Intermediate",
+    "code": "\"bd*2 [sd cp]*2 hh(3,8) ~\".s()"
+  },
+  {
+    "id": "effects",
+    "title": "Effects Chain",
+    "description": "Pattern with delay, reverb, and filter effects",
+    "category": "Effects",
+    "code": "note(\"c4 e4 g4 a4\")\n  .s(\"square\")\n  .lpf(1000)\n  .resonance(10)\n  .delay(0.5)\n  .delaytime(0.25)\n  .delayfeedback(0.6)\n  .room(0.5)\n  .gain(0.6)"
+  },
+  {
+    "id": "arpeggio",
+    "title": "Arpeggio",
+    "description": "Fast arpeggiated pattern with octave layering",
+    "category": "Melody",
+    "code": "note(\"c e g\")\n  .fast(4)\n  .off(1/8, x => x.add(12))\n  .s(\"sine\")\n  .lpf(1200)\n  .room(0.3)"
+  },
+  {
+    "id": "techno",
+    "title": "Techno Beat",
+    "description": "A driving techno rhythm",
+    "category": "Drums",
+    "code": "stack(\n  \"bd(3,8)\".gain(1.0),\n  \"~ sd ~ sd\".gain(0.8),\n  \"hh*16\".gain(0.4),\n  \"[~ ~ cp ~]*2\".gain(0.6)\n).s()"
+  },
+  {
+    "id": "transformation",
+    "title": "Pattern Transformation",
+    "description": "Using every() and iter() to create variation",
+    "category": "Intermediate",
+    "code": "\"bd sd hh sd\"\n  .s()\n  .every(4, x => x.rev())\n  .iter(4)\n  .slow(2)"
+  },
+  {
+    "id": "afro",
+    "title": "Afro Beat",
+    "description": "African-inspired polyrhythmic pattern",
+    "category": "Drums",
+    "code": "stack(\n  \"bd ~ ~ ~ ~ ~ bd ~ ~ ~ bd ~ ~ ~ bd ~\",\n  \"hh ~ hh hh hh ~ hh ~ hh ~ hh ~ hh ~ hh ~\",\n  \"~ ~ ~ ~ ~ ~ rim ~ ~ ~ rim ~ rim ~ ~ ~\"\n).s().slow(2)"
+  },
+  {
+    "id": "chord-prog",
+    "title": "Chord Progression",
+    "description": "A simple chord progression",
+    "category": "Harmony",
+    "code": "note(\"[c2,e2,g2] [a1,c2,e2] [f2,a2,c3] [g2,b2,d3]\")\n  .s(\"sawtooth\")\n  .slow(4)\n  .lpf(800)\n  .gain(0.6)\n  .room(0.4)"
+  }
+]
