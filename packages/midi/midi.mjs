@@ -447,8 +447,8 @@ Pattern.prototype.midi = function (midiport, options = {}) {
       if (midicmd[0] === 'progNum') {
         sendProgramChange(midicmd[1], device, midichan, timeOffsetString);
       } else if (midicmd[0] === 'cc') {
-        if (midicmd.length === 2) {
-          sendCC(midicmd[0], midicmd[1] / 127, device, midichan, timeOffsetString);
+        if (midicmd.length === 3) {
+          sendCC(midicmd[1], midicmd[2] / 127, device, midichan, timeOffsetString);
         }
       } else if (midicmd[0] === 'sysex') {
         if (midicmd.length === 3) {
